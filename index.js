@@ -1,7 +1,7 @@
 const CDP = require('chrome-remote-interface')
 const remoteDom = require('remote-dom')
 const Promise = require('bluebird')
-// const R = require('ramda')
+const R = require('ramda')
 // const _ = require('lodash')
 const util = require('util')
 const runPromise = require('./lib/runPromise')
@@ -270,30 +270,6 @@ async function blastClick (DOM, DOMDebugger, Runtime) {
   }
 }
 
-async function downAcrossClickSweep (Page, Input) {
-  let vv
-  try {
-    let lm = await Page.getLayoutMetrics()
-    console.log(lm)
-    vv = lm.visualViewport
-    // let windowBounds = await Browser.getWindowBounds()
-  } catch (error) {
-    console.error(error)
-  }
-  let ch = vv.clientHeight, cw = vv.clientWidth
-  for (let x = 0; x < cw; x += 10) {
-    for (let y = 0; y < ch; y += 5) {
-      try {
-        await Input.dispatchMouseEvent({x, y, type: 'mousePressed', button: 'left', clickCount: 1})
-        await Input.dispatchMouseEvent({x, y, type: 'mouseReleased', button: 'left', clickCount: 1})
-        console.log(`(${x},${y})`)
-      } catch (error) {
-        console.error(error)
-      }
-    }
-  }
-}
-
 function maybeNavigate (Page) {
   return new Promise((resolve, reject) => {
     let timeOut = setTimeout(() => {
@@ -308,6 +284,34 @@ function maybeNavigate (Page) {
     })
   })
 }
+
+async function downAcrossClickSweep (Page, Input) {
+  let vv
+  try {
+    let lm = await Page.getLayoutMetrics()
+    vv = lm.visualViewport
+    // let windowBounds = await Browser.getWindowBounds()
+  } catch (error) {
+    console.error(error)
+  }
+  let ch = vv.clientHeight, cw = vv.clientWidth
+  for (let x = 0; x < cw; x += 10) {
+    for (let y = 0; y < ch; y += 1) {
+      try {
+        await Input.dispatchMouseEvent({x, y, type: 'mousePressed', button: 'left', clickCount: 1})
+        await Input.dispatchMouseEvent({x, y, type: 'mouseReleased', button: 'left', clickCount: 1})
+        // console.log(`(${x},${y})`)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    await maybeNavigate(Page)
+    console.log(x)
+  }
+}
+
+
 
 function go () {
   CDP(async client => {
@@ -327,7 +331,7 @@ function go () {
       ])
 
       await Page.navigate({url: 'https://reacttraining.com/react-router/web/guides/quick-start'});
-      await Page.setControlNavigations({enabled: true})
+      // await Page.setControlNavigations({enabled: true})
       await Page.loadEventFired()
 
     } catch (err) {
@@ -345,29 +349,6 @@ function go () {
     //     console.log(err, response)
     //   })
     // })
-    let vv
-    try {
-      let lm = await Page.getLayoutMetrics()
-      vv = lm.visualViewport
-      // let windowBounds = await Browser.getWindowBounds()
-    } catch (error) {
-      console.error(error)
-    }
-    let ch = vv.clientHeight, cw = vv.clientWidth
-    for (let x = 0; x < cw; x += 10) {
-      for (let y = 0; y < ch; y += 1) {
-        try {
-          await Input.dispatchMouseEvent({x, y, type: 'mousePressed', button: 'left', clickCount: 1})
-          await Input.dispatchMouseEvent({x, y, type: 'mouseReleased', button: 'left', clickCount: 1})
-          // console.log(`(${x},${y})`)
-        } catch (error) {
-          console.error(error)
-        }
-      }
-
-      await maybeNavigate(Page)
-      console.log(x)
-    }
 
     //getDocument-BodyFinder 31.742ms
 
@@ -390,5 +371,25 @@ function go () {
   })
 }
 
-// console.log(URL.parse('https://reacttraining.com/react-router/web/guides/quick-start'))
-go()
+
+
+// document.links
+//'//a
+// //@src|//@href|//@codebase
+// $x('//a/@href|//link/@href|//script/@src')
+// Array.from(document.links).map(it => it.href)
+
+/*
+ VUE: window.VUE
+ ELM: window.ELM
+ Angular: window.angular
+ React: window.React | $x('//@data-reactroot')
+ jquery: window.jquery | window.$
+ webpack: window.webpackJsonp
+ http://web.archive.org/cdx/search/cdx?url=https://cdnjs.cloudflare.com/ajax/libs/*&showNumPages=true
+
+ */
+let purl = URL.parse('https://reacttraining.com/react-router/web/guides/quick-start')
+// $x("//a[contains(@href,'react-router/web')]")
+console.log(purl.pathname.substr(1).split('/'))
+// go()
