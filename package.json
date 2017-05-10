@@ -5,11 +5,16 @@
   "license": "MIT",
   "dependencies": {
     "bluebird": "^3.5.0",
-    "chrome-remote-interface": "^0.21.0",
+    "chrome-remote-interface": "^0.22.0",
     "eventemitter3": "^2.0.3",
-    "fs-extra": "^3.0.0",
+    "filenamify-url": "^1.0.0",
+    "fs-extra": "^3.0.1",
     "lodash": "^4.17.4",
+    "normalize-url": "^1.9.1",
     "ramda": "^0.23.0",
-    "remote-dom": "^0.0.3"
+    "remote-dom": "^0.0.3",
+    "string": "^3.3.3",
+    "uuid": "^3.0.1",
+    "yargs": "^8.0.1"
   }
 }
