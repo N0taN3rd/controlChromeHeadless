@@ -610,7 +610,6 @@ function go () {
     //     console.log(err, response)
     //   })
     // })
-    let vv
     // try {
     //   let lm = await Page.getLayoutMetrics()
     //   vv = lm.visualViewport
