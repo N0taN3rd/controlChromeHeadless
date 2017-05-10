@@ -655,4 +655,6 @@ function go () {
 }
 
 // console.log(URL.parse('https://reacttraining.com/react-router/web/guides/quick-start'))
-go()
+// go()
+let toParse = 'http://m.addthis.com/live/red_lojson/100eng.json?sh=0&ph=9009&ivh=970&dt=9600&pdt=4093&ict=&pct=0&perf=widget%7C4094%7C153&rndr=render_toolbox%7C11007%2Crender_layers_sharedock%7C11089&cmenu=null&ppd=0&ppl=0&fbe=&xmv=0&xms=0&xmlc=0&jsfw=backbone%2Cjquery&jsfwv=backbone-1.3.3%2Cjquery-3.2.1&al=men%2Cmsd&scr=0&scv=0&apiu=1&ba=3&sid=59135458356e941f&rev=v7.13.0-wp&pub=ra-536db77a775cf072&dp=www.breitbart.com&fp=&pfm=0&icns=twitter%2Cemail%2Cfacebook'
+console.log(URL.parse(toParse))
