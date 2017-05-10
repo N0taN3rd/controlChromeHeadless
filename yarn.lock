@@ -276,6 +276,10 @@ p-locate@^2.0.0:
   dependencies:
     p-limit "^1.1.0"
 
+parse-domain@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/parse-domain/-/parse-domain-1.1.0.tgz#6cb05bc9002552773bf7cc4c06dbd60dc939a973"
+
 parse-json@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/parse-json/-/parse-json-2.2.0.tgz#f480f40434ef80741f8469099f8dea18f55a4dc9"

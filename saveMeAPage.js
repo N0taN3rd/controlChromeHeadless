@@ -181,6 +181,7 @@ if (allLinksOnPage) {
     let pageRes = new Map()
     let capture = true
     let crawlThese = []
+
     Page.navigate({url: seedUrl}, (...args) => {
       console.log('page navigate', ...args)
     })
@@ -265,18 +266,15 @@ if (allLinksOnPage) {
       }
       if (!evalFailed) {
         if (initial) {
-          outlinks = evaluatedPage.result.value.map(it => `outlink: ${it} L a/@href\r\n`).join('')
           let seen = new Set()
-          crawlThese = evaluatedPage.result.value.map(it => normalizeUrl(it, {
-            stripFragment: true,
-            stripWWW: false
-          })).filter(it => {
-            let have = seen.has(it)
-            if (!have) {
-              seen.add(it)
+          outlinks = evaluatedPage.result.value.map(it => {
+            let maybeSeen = normalizeUrl(it, {stripFragment: true, stripWWW: false})
+            if (!seen.has(maybeSeen)) {
+              crawlThese.push(maybeSeen)
+              seen.add(maybeSeen)
             }
-            return !have
-          })
+            return `outlink: ${it} L a/@href\r\n`
+          }).join('')
         } else {
           outlinks = evaluatedPage.result.value
         }
@@ -360,7 +358,81 @@ if (allLinksOnPage) {
           }).s
           await writeWarcEntryBlock(warcOut, respWHeader, resHeaderContentBuffer, resData, '\r\n', recordSeparator)
         } else {
+          // redirection,post+noReply,we cut off capturing so response dropped likely
           console.log('boooo')
+          console.log(req)
+          let requestHttpString
+          let responseHttpString
+          if (res.request.redirectResponse) {
+            // a redirection
+            if (res.request.redirectResponse.requestHeadersText === undefined || res.request.redirectResponse.requestHeadersText === null) {
+              if (res.request.redirectResponse.requestHeaders === undefined || res.request.redirectResponse.requestHeaders === null) {
+                console.log('redirection reqHT null and reqH null')
+                // let purl = URL.parse(req.request.url)
+                // requestHttpString = `${req.request.method} ${purl.path} HTTP/1.1\r\nHost: ${purl.host}\r\nConnection: keep-alive\r\nUser-Agent: ${UA}\r\nAccept: */*\r\n`
+                // requestHttpString += req.request.headers['Referer'] ? `Referer: ${req.request.headers['Referer']}\r\n` : `Referer: ${seedUrl}\r\n\r\n`
+              } else {
+                console.log('redirection reqHT null')
+                // let requestHeaders = res.request.redirectResponse.requestHeaders
+                // requestHttpString = `${requestHeaders[':method']} ${requestHeaders[':path']} HTTP/1.1\r\n`
+                // for (let [k, v] of Object.entries(requestHeaders)) {
+                //   if (k[0] !== ':') {
+                //     requestHttpString += `${k}: ${v}\r\n`
+                //   }
+                // }
+                // requestHttpString += '\r\n'
+              }
+            } else {
+              requestHttpString = res.request.redirectResponse.requestHeadersText
+            }
+            if (res.redirectResponse.headersText === undefined || res.request.redirectResponse.headersText === null) {
+              responseHttpString = `HTTP/1.1 ${res.request.redirectResponse.status} ${STATUS_CODES[res.request.redirectResponse.status]}\r\n`
+              for (let [k, v] of Object.entries(res.request.redirectResponse.headers)) {
+                if (k[0] !== ':') {
+                  responseHttpString += `${k}: ${v}\r\n`
+                }
+              }
+              responseHttpString += '\r\n'
+            } else {
+              responseHttpString = res.request.redirectResponse.headersText
+            }
+            swapper.setValue(warcRequestHeader)
+            let reqHeadContentBuffer
+            if (req.request.postData) {
+              reqHeadContentBuffer = Buffer.from(`\r\n ${requestHttpString}${req.request.postData}\r\n`, 'utf8')
+            } else {
+              reqHeadContentBuffer = Buffer.from('\r\n' + requestHttpString, 'utf8')
+            }
+            let reqWHeader = swapper.template({
+              targetURI: req.request.url,
+              concurrentTo: rid,
+              now,
+              rid: uuid(),
+              len: reqHeadContentBuffer.length
+            }).s
+            await writeWarcEntryBlock(warcOut, reqWHeader, reqHeadContentBuffer, recordSeparator)
+            let resData
+            try {
+              let rbody = await Network.getResponseBody({requestId: req.requestId})
+              if (rbody.base64Encoded) {
+                resData = Buffer.from(rbody.body, 'base64')
+              } else {
+                resData = Buffer.from(rbody.body, 'utf8')
+              }
+            } catch (err) {
+              resData = Buffer.from([])
+              console.error(err)
+              console.error(req.request.url)
+            }
+            let resHeaderContentBuffer = Buffer.from('\r\n' + responseHttpString, 'utf8')
+            let respWHeader = swapper.setValue(warcResponseHeader).template({
+              targetURI: req.request.url,
+              now,
+              rid: uuid(),
+              len: resHeaderContentBuffer.length + resData.length
+            }).s
+            await writeWarcEntryBlock(warcOut, respWHeader, resHeaderContentBuffer, resData, '\r\n', recordSeparator)
+          }
         }
       }
       initial = false
