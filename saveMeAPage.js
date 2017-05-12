@@ -432,7 +432,7 @@ if (allLinksOnPage) {
               len: resHeaderContentBuffer.length + resData.length
             }).s
             await writeWarcEntryBlock(warcOut, respWHeader, resHeaderContentBuffer, resData, '\r\n', recordSeparator)
-          } else if (res.request.method === 'GET') {
+          } else if (req.request.method === 'GET') {
             let purl = URL.parse(req.request.url)
             requestHttpString = `${req.request.method} ${purl.path} HTTP/1.1\r\nHost: ${purl.host}\r\n`
             for (let [k, v] of Object.entries(req.request.headers)) {

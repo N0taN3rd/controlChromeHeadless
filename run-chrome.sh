@@ -6,7 +6,7 @@ chromeBinary="google-chrome-beta"
 
 
 if [ "$1" = "headless" ]; then
-   google-chrome-beta --headless --remote-debugging-port=9222
+   google-chrome-beta --headless --disable-gpu --remote-debugging-port=9222
 else
     google-chrome-beta --remote-debugging-port=9222
 fi
