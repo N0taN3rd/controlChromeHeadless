@@ -403,7 +403,7 @@ function go () {
         DOM.enable(),
         Console.enable(),
         Page.enable(),
-        Network.enable({maxTotalBufferSize: 1000000000}),
+        Network.enable(),
       ])
 
       // await Page.setControlNavigations({enabled: true})
@@ -417,192 +417,21 @@ function go () {
     // Page.navigate({url: 'https://reacttraining.com/react-router/web/guides/quick-start'}, (...args) => {
     //   console.log('page navigate', ...args)
     // })
-    let seedUrl = 'https://twitter.com/WebSciDL'
+    let seedUrl = 'http://web.archive.org/web/20170515050340/http://www.foodnetwork.com/'
     Page.navigate({url: seedUrl}, (...args) => {
       console.log('page navigate', ...args)
     })
     // Array.from(document.links).map(it => it.href)
     let capture = true
     Page.loadEventFired(async (info) => {
-      // await Promise.delay(1500)
-      let warcOut = fs.createWriteStream('chromeCrawled.warc')
-      warcOut.on('error', err => {
-        console.error('error happened while writting to the warc', err)
-        warcOut.end()
-        // this.emit('error', err)
-      })
-      warcOut.on('finish', async () => {
-        console.log('All writes are now complete.')
-        // this.emit('finished')
-        warcOut.destroy()
-        await client.close();
-      })
-      capture = false
-      let now = new Date().toISOString()
-      now = now.substr(0, now.indexOf('.')) + 'Z'
-      let rid = uuid()
-      let swapper = S(wf.warcHeaderContent)
-      let whc = Buffer.from('\r\n' + swapper.template({
-          version: '0.1',
-          isPartOfV: 'chromeCrawled',
-          warcInfoDescription: 'real chrome crawled',
-          ua: UA
-        }).s + '\r\n', 'utf8')
-
-      let wh = Buffer.from(swapper.setValue(wf.warcHeader).template({
-        fileName: 'chromeCrawled.warc',
-        now,
-        len: whc.length,
-        rid
-      }).s, 'utf8')
-      // await writeWarcEntry(warcOut, wh)
-      // await writeWarcEntry(warcOut, whc)
-      // await writeWarcEntry(warcOut, wf.recordSeparator)
-      await writeWarcEntryBlock(warcOut, wh, whc, wf.recordSeparator)
-      let wmhc = Buffer.from('\r\n' + 'outlink: https://github.com/gajus/redux-immutable/tree/1.3.7 L a/@href' + '\r\n', 'utf8')
-      let wmh = Buffer.from(swapper.setValue(wf.warcMetadataHeader).template({
-        targetURI: seedUrl,
-        now,
-        len: wmhc.length,
-        concurrentTo: rid,
-        rid: uuid()
-      }).s, 'utf8')
-      // await writeWarcEntry(warcOut, wmh)
-      // await writeWarcEntry(warcOut, wmhc)
-      // await writeWarcEntry(warcOut, wf.recordSeparator)
-      await writeWarcEntryBlock(warcOut, wmh, wmhc, wf.recordSeparator)
-      for (let {req, res} of iterateReqRes(pageReqs, pageRes)) {
-        if (res) {
-          let requestHttpString
-          let responseHttpString
-          if (res.response.requestHeadersText === undefined || res.response.requestHeadersText === null) {
-            // let requestHeaders = res.response.requestHeaders
-            // let requestHttpString = `${requestHeaders[':method']} ${requestHeaders[':path']} HTTP/1.0\r\n`
-            if (res.response.requestHeaders === undefined || res.response.requestHeaders === null) {
-              let purl = URL.parse(req.request.url)
-              requestHttpString = `${req.request.method} ${purl.path} HTTP/1.1\r\nHost: ${purl.host}\r\nConnection: keep-alive\r\nUser-Agent: ${UA}\r\nAccept: */*\r\n`
-              requestHttpString += req.request.headers['Referer'] ? `Referer: ${req.request.headers['Referer']}\r\n` : `Referer: ${seedUrl}\r\n\r\n`
-            } else {
-              let requestHeaders = res.response.requestHeaders
-              requestHttpString = `${requestHeaders[':method']} ${requestHeaders[':path']} HTTP/1.1\r\n`
-              for (let [k, v] of Object.entries(requestHeaders)) {
-                if (k[0] !== ':') {
-                  requestHttpString += `${k}: ${v}\r\n`
-                }
-              }
-              requestHttpString += '\r\n'
-            }
-          } else {
-            requestHttpString = res.response.requestHeadersText
-          }
-
-          if (res.response.headersText === undefined || res.response.headersText === null) {
-            responseHttpString = `HTTP/1.1 ${res.response.status} ${STATUS_CODES[res.response.status]}\r\n`
-            for (let [k, v] of Object.entries(res.response.headers)) {
-              if (k[0] !== ':') {
-                responseHttpString += `${k}: ${v}\r\n`
-              }
-            }
-            responseHttpString += '\r\n'
-            // console.log(res)
-          } else {
-            // console.log(res.response.headersText)
-            responseHttpString = res.response.headersText
-          }
-          swapper.setValue(wf.warcRequestHeader)
-          let reqHeadContentBuffer
-          if (req.request.postData) {
-            reqHeadContentBuffer = Buffer.from(`\r\n ${requestHttpString}${req.request.postData}\r\n`, 'utf8')
-          } else {
-            reqHeadContentBuffer = Buffer.from('\r\n' + requestHttpString, 'utf8')
-          }
-          let reqWHeader = swapper.template({
-            targetURI: req.request.url,
-            concurrentTo: rid,
-            now,
-            rid: uuid(),
-            len: reqHeadContentBuffer.length
-          }).s
-          await writeWarcEntryBlock(warcOut, reqWHeader, reqHeadContentBuffer, wf.recordSeparator)
-          let resData
-          try {
-            let rbody = await Network.getResponseBody({requestId: req.requestId})
-            if (rbody.base64Encoded) {
-              resData = Buffer.from(rbody.body, 'base64')
-            } else {
-              resData = Buffer.from(rbody.body, 'utf8')
-            }
-          } catch (err) {
-            resData = Buffer.from([])
-            console.error(err)
-          }
-          let resHeaderContentBuffer = Buffer.from('\r\n' + responseHttpString, 'utf8')
-          let respWHeader = swapper.setValue(wf.warcResponseHeader).template({
-            targetURI: req.request.url,
-            now,
-            rid: uuid(),
-            len: resHeaderContentBuffer.length + resData.length
-          }).s
-          await writeWarcEntryBlock(warcOut, respWHeader, resHeaderContentBuffer, resData, '\r\n', wf.recordSeparator)
-          console.log('-------------------------------------')
-        } else {
-          console.log('boooo')
-        }
-
-      }
-      // for(let [requestId,v] of pageRes.entries()) {
-      //   console.log(v.response.url)
-      //   if (v.response.url === 'https://twitter.com/WebSciDL') {
-      //     try {
-      //       let rbody = await Network.getResponseBody({requestId})
-      //       console.log(rbody.body)
-      //     } catch (error) {
-      //       console.error(error)
-      //     }
-      //   }
-      //   // try {
-      //   //   let rbody = await Network.getResponseBody({requestId})
-      //   //   if (rbody.base64Encoded) {
-      //   //     console.log(Buffer.from(rbody.body,'base64').toString('utf8'))
-      //   //   }
-      //   // } catch (err) {
-      //   //   console.error(err)
-      //   // }
-      //   console.log('-------------------------------------')
-      // }
-
-      // pageGets.forEach(async (good, requestId) => {
-      //   if (good) {
-      //     try {
-      //       let rbody = await Network.getResponseBody({requestId})
-      //       // console.log(rbody)
-      //       console.log(pageReqs.get(requestId))
-      //     } catch (err) {
-      //       console.error(err)
-      //     }
-      //   } else {
-      //     console.log('no good',pageReqs.get(requestId))
-      //   }
-      // })
 
     })
     Network.requestWillBeSent((info) => {
-      // console.log(info)
-      if (capture) {
-        // if (info.request.method === 'GET') {
-        //   pageGets.set(info.requestId, false)
-        // }
-        pageReqs.set(info.requestId, info)
-      }
+      console.log(info.request.url)
 
     })
     Network.responseReceived((info) => {
-      if (capture) {
-        pageRes.set(info.requestId, info)
-        // if (info.response.status === 200 && pageReqs.has(info.requestId)) {
-        //   pageGets.set(info.requestId, true)
-        // }
-      }
+      console.log(info.request.url)
     })
 
     // Page.navigationRequested((args) => {
@@ -654,7 +483,4 @@ function go () {
   })
 }
 
-// console.log(URL.parse('https://reacttraining.com/react-router/web/guides/quick-start'))
-// go()
-let toParse = 'http://m.addthis.com/live/red_lojson/100eng.json?sh=0&ph=9009&ivh=970&dt=9600&pdt=4093&ict=&pct=0&perf=widget%7C4094%7C153&rndr=render_toolbox%7C11007%2Crender_layers_sharedock%7C11089&cmenu=null&ppd=0&ppl=0&fbe=&xmv=0&xms=0&xmlc=0&jsfw=backbone%2Cjquery&jsfwv=backbone-1.3.3%2Cjquery-3.2.1&al=men%2Cmsd&scr=0&scv=0&apiu=1&ba=3&sid=59135458356e941f&rev=v7.13.0-wp&pub=ra-536db77a775cf072&dp=www.breitbart.com&fp=&pfm=0&icns=twitter%2Cemail%2Cfacebook'
-console.log(URL.parse(toParse))
+go()

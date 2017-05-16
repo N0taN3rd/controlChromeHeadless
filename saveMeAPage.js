@@ -611,8 +611,8 @@ if (allLinksOnPage) {
             }
           } catch (err) {
             resData = Buffer.from([])
-            // console.error(err)
-            // console.error(req.request.url)
+            console.error(err)
+            console.error(req.request.url)
           }
           let resHeaderContentBuffer = Buffer.from('\r\n' + responseHttpString, 'utf8')
           let respWHeader = swapper.setValue(warcResponseHeader).template({
@@ -661,13 +661,13 @@ if (allLinksOnPage) {
             } else {
               responseHttpString = req.redirectResponse.headersText
             }
+            swapper.setValue(warcRequestHeader)
             let reqHeadContentBuffer
             if (req.request.postData) {
               reqHeadContentBuffer = Buffer.from(`\r\n ${requestHttpString}${req.request.postData}\r\n`, 'utf8')
             } else {
               reqHeadContentBuffer = Buffer.from('\r\n' + requestHttpString, 'utf8')
             }
-            swapper.setValue(warcRequestHeader)
             let reqWHeader = swapper.template({
               targetURI: req.request.url,
               concurrentTo: rid,
@@ -686,8 +686,8 @@ if (allLinksOnPage) {
               }
             } catch (err) {
               resData = Buffer.from([])
-              console.error(err)
-              console.error(req.request.url)
+              // console.error(err)
+              // console.error(req.request.url)
             }
             let resHeaderContentBuffer = Buffer.from('\r\n' + responseHttpString, 'utf8')
             let respWHeader = swapper.setValue(warcResponseHeader).template({
@@ -697,7 +697,7 @@ if (allLinksOnPage) {
               len: resHeaderContentBuffer.length + resData.length
             }).s
             await writeWarcEntryBlock(warcOut, respWHeader, resHeaderContentBuffer, resData, '\r\n', recordSeparator)
-          } else if (res.request.method === 'GET') {
+          } else if (req.request.method === 'GET') {
             let purl = URL.parse(req.request.url)
             requestHttpString = `${req.request.method} ${purl.path} HTTP/1.1\r\nHost: ${purl.host}\r\n`
             for (let [k, v] of Object.entries(req.request.headers)) {
