@@ -1,6 +1,7 @@
 const program = require('commander')
 const chalk = require('chalk')
-const log = console.log
+const _ = require('lodash')
+const path = require('path')
 
 const cwd = process.cwd()
 
@@ -43,29 +44,30 @@ function handleOutDir (supplied, defaultValue) {
   }
 }
 
+function normalizeCrawlOptions (options) {
+  options.host = options.host || options.parent.host
+  options.port = options.port || options.parent.port
+  options.warcName = options.warcName || options.parent.warcName
+  options.outputDirectory = options.outputDirectory || options.parent.outputDirectory
+}
+
 program
-// .usage('[options] [command|URL]')
   .version('1.0.0', '-v, --version')
+
+program
+  .command('single-page <url> [urls.....]', 'Preserve a single page or a series of pages')
+  .alias('sp')
   .option('-H, --host [host]', 'Chrome Debugging Protocol host. Defaults to localhost', 'localhost')
   .option('-p, --port [port]', 'Chrome Debugging Protocol port. Defaults to 9222', handlePort, 9222)
-  .option('-t, --timeout [ms]', 'Time to wait for navigation to complete before giving up with a URL', parseInt)
-  .option('-a, --agent [agent]', 'Chrome user agent override')
-  .option('-n, --name [warcFileName]', 'The name of the warc. Defaults to seedURL-datetime, the seed URL will be filenamified')
-  .option('-o, --out <where>', 'the directory where to create the warc in', handleOutDir, cwd)
-
-// program.missingArgument = name => {
-//   console.error("  error: missing required argument `%s'", name)
-//   program.outputHelp(chalk.green)
-//   process.exit(1)
-// }
-
-program
-  .command('single-page <url> [urls.....]')
-  .alias('sp')
-  .description('preserve a single web page')
+  .option('-n, --navigation-timeout [ms]', 'Time to wait in milliseconds for navigation to complete before giving up on a URL', parseInt)
+  .option('-l, --load-timeout [ms]', 'Time to wait in milliseconds for the page to load before WARC generation begins', parseInt)
+  .option('-a, --agent [agent]', 'Override the default Chrome User-Agent')
+  .option('-w, --warc-name [warcFileName]', 'The name of the WARC. Defaults to seedURL-datetime, the seed URL will be filenamified')
+  .option('-o, --output-directory [where]', 'The directory where to create the WARC in, defaults to current working directory', handleOutDir, cwd)
   .action((url, varArgs, options) => {
-    options.port = options.port || options.parent.port
-    console.log(options.port)
+    options = options || varArgs
+    normalizeCrawlOptions(options)
+    console.log(options)
   })
 
 program.parse(process.argv)
