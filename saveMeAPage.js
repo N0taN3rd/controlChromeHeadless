@@ -326,7 +326,7 @@ if (allLinksOnPage) {
           if (req.request.postData) {
             reqHeadContentBuffer = Buffer.from(`\r\n ${requestHttpString}${req.request.postData}\r\n`, 'utf8')
           } else {
-            reqHeadContentBuffer = Buffer.from('\r\n' + requestHttpString, 'utf8')
+            reqHeadContentBuffer = Buffer.from(`\r\n${requestHttpString}`, 'utf8')
           }
           let reqWHeader = swapper.template({
             targetURI: req.request.url,
@@ -349,7 +349,7 @@ if (allLinksOnPage) {
             console.error(err)
             console.error(req.request.url)
           }
-          let resHeaderContentBuffer = Buffer.from('\r\n' + responseHttpString, 'utf8')
+          let resHeaderContentBuffer = Buffer.from(`\r\n${responseHttpString}`, 'utf8')
           let respWHeader = swapper.setValue(warcResponseHeader).template({
             targetURI: req.request.url,
             now,
@@ -399,9 +399,9 @@ if (allLinksOnPage) {
             swapper.setValue(warcRequestHeader)
             let reqHeadContentBuffer
             if (req.request.postData) {
-              reqHeadContentBuffer = Buffer.from(`\r\n ${requestHttpString}${req.request.postData}\r\n`, 'utf8')
+              reqHeadContentBuffer = Buffer.from(`\r\n${requestHttpString}${req.request.postData}\r\n`, 'utf8')
             } else {
-              reqHeadContentBuffer = Buffer.from('\r\n' + requestHttpString, 'utf8')
+              reqHeadContentBuffer = Buffer.from(`\r\n${requestHttpString}`, 'utf8')
             }
             let reqWHeader = swapper.template({
               targetURI: req.request.url,
@@ -589,9 +589,9 @@ if (allLinksOnPage) {
           swapper.setValue(warcRequestHeader)
           let reqHeadContentBuffer
           if (req.request.postData) {
-            reqHeadContentBuffer = Buffer.from(`\r\n ${requestHttpString}${req.request.postData}\r\n`, 'utf8')
+            reqHeadContentBuffer = Buffer.from(`\r\n${requestHttpString}${req.request.postData}\r\n`, 'utf8')
           } else {
-            reqHeadContentBuffer = Buffer.from('\r\n' + requestHttpString, 'utf8')
+            reqHeadContentBuffer = Buffer.from(`\r\n${requestHttpString}`, 'utf8')
           }
           let reqWHeader = swapper.template({
             targetURI: req.request.url,
@@ -614,7 +614,7 @@ if (allLinksOnPage) {
             console.error(err)
             console.error(req.request.url)
           }
-          let resHeaderContentBuffer = Buffer.from('\r\n' + responseHttpString, 'utf8')
+          let resHeaderContentBuffer = Buffer.from(`\r\n${responseHttpString}`, 'utf8')
           let respWHeader = swapper.setValue(warcResponseHeader).template({
             targetURI: req.request.url,
             now,
@@ -664,9 +664,9 @@ if (allLinksOnPage) {
             swapper.setValue(warcRequestHeader)
             let reqHeadContentBuffer
             if (req.request.postData) {
-              reqHeadContentBuffer = Buffer.from(`\r\n ${requestHttpString}${req.request.postData}\r\n`, 'utf8')
+              reqHeadContentBuffer = Buffer.from(`\r\n${requestHttpString}${req.request.postData}\r\n`, 'utf8')
             } else {
-              reqHeadContentBuffer = Buffer.from('\r\n' + requestHttpString, 'utf8')
+              reqHeadContentBuffer = Buffer.from(`\r\n${requestHttpString}`, 'utf8')
             }
             let reqWHeader = swapper.template({
               targetURI: req.request.url,
@@ -689,7 +689,7 @@ if (allLinksOnPage) {
               // console.error(err)
               // console.error(req.request.url)
             }
-            let resHeaderContentBuffer = Buffer.from('\r\n' + responseHttpString, 'utf8')
+            let resHeaderContentBuffer = Buffer.from(`\r\n${responseHttpString}`, 'utf8')
             let respWHeader = swapper.setValue(warcResponseHeader).template({
               targetURI: req.request.url,
               now,
@@ -707,7 +707,7 @@ if (allLinksOnPage) {
             }
             requestHttpString += '\r\n'
             swapper.setValue(warcRequestHeader)
-            let reqHeadContentBuffer = Buffer.from('\r\n' + requestHttpString, 'utf8')
+            let reqHeadContentBuffer = Buffer.from(`\r\n${requestHttpString}`, 'utf8')
             let reqWHeader = swapper.template({
               targetURI: req.request.url,
               concurrentTo: rid,
