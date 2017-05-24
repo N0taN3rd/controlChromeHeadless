@@ -61,11 +61,17 @@ program
   .option('-p, --port [port]', 'Chrome Debugging Protocol port. Defaults to 9222', handlePort, 9222)
   .option('-n, --navigation-timeout [ms]', 'Time to wait in milliseconds for navigation to complete before giving up on a URL', parseInt)
   .option('-l, --load-timeout [ms]', 'Time to wait in milliseconds for the page to load before WARC generation begins', parseInt)
-  .option('-a, --agent [agent]', 'Override the default Chrome User-Agent')
+  .option('-U, --agent [agent]', 'Override the default Chrome User-Agent')
   .option('-w, --warc-name [warcFileName]', 'The name of the WARC. Defaults to seedURL-datetime, the seed URL will be filenamified')
   .option('-o, --output-directory [where]', 'The directory where to create the WARC in, defaults to current working directory', handleOutDir, cwd)
   .action((url, varArgs, options) => {
-    options = options || varArgs
+    let multiple
+    if (options) {
+      // var args
+
+    } else {
+      options = varArgs
+    }
     normalizeCrawlOptions(options)
     console.log(options)
   })
