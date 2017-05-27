@@ -9,7 +9,7 @@ const URL = require('url')
 const S = require('string')
 const uuid = require('uuid/v1')
 const fs = require('fs-extra')
-const wf = require('./lib/warcFields')
+const wf = require('./lib/warc/warcFields')
 const {STATUS_CODES} = require('http')
 
 // const fp =  require('lodash/fp/_baseConvert')(_, _)
@@ -75,7 +75,7 @@ process.on('unhandledRejection', function (r) {
   console.error(r)
 })
 
-//Network.setMonitoringXHREnabled
+// Network.setMonitoringXHREnabled
 async function runner (client) {
   process.on('exit', function () {
     if (client) client.close()
@@ -89,7 +89,7 @@ async function runner (client) {
       Debugger.enable(),
       DOM.enable(),
       Console.enable(),
-      Page.enable(),
+      Page.enable()
     ])
     Page.loadEventFired(function () {
       console.log('loaded')
@@ -103,7 +103,6 @@ async function runner (client) {
     await Page.navigate({url: 'https://chromium.org'})
     Runtime.consoleAPICalled(function ({args}) {
       console.log(args)
-
     })
   } catch (error) {
     console.error(error)
@@ -384,7 +383,6 @@ function isDefined (what) {
   return what !== null || what !== undefined
 }
 
-
 function go () {
   CDP(async client => {
     process.on('exit', function () {
@@ -394,7 +392,7 @@ function go () {
     // setup handlers
     // enable events then start!
     // console.log(Number.MAX_SAFE_INTEGER)'
-    //9,007,199,254,740,991
+    // 9,007,199,254,740,991
     // 700000000
     try {
       await Promise.all([
@@ -403,13 +401,12 @@ function go () {
         DOM.enable(),
         Console.enable(),
         Page.enable(),
-        Network.enable(),
+        Network.enable()
       ])
 
       // await Page.setControlNavigations({enabled: true})
-
     } catch (err) {
-      console.error(err);
+      console.error(err)
     }
     let pageGets = new Map()
     let pageReqs = new Map()
@@ -428,7 +425,6 @@ function go () {
     })
     Network.requestWillBeSent((info) => {
       console.log(info.request.url)
-
     })
     Network.responseReceived((info) => {
       console.log(info.request.url)
@@ -462,7 +458,7 @@ function go () {
     //   console.log(x)
     // }
 
-    //getDocument-BodyFinder 31.742ms
+    // getDocument-BodyFinder 31.742ms
 
     // let clickerIds
     // try {

@@ -46,18 +46,18 @@ function killAllJsAlertPromptConfirm (win) {
     configurable: false,
     writeable: false,
     value: function () {}
-  });
+  })
   Object.defineProperty(win, 'onunload', {
     configurable: false,
     writeable: false,
     value: function () {}
-  });
-  window.alert = function () {};
-  window.confirm = function () {};
-  window.prompt = function () {};
-  win.alert = function () {};
-  win.confirm = function () {};
-  win.prompt = function () {};
+  })
+  window.alert = function () {}
+  window.confirm = function () {}
+  window.prompt = function () {}
+  win.alert = function () {}
+  win.confirm = function () {}
+  win.prompt = function () {}
 }
 
 function getMeOutLinks () {
@@ -169,7 +169,7 @@ if (allLinksOnPage) {
         Debugger.enable(),
         DOM.enable(),
         Page.enable(),
-        Network.enable({maxTotalBufferSize: 1000000000}), // for response body retrieval roughly 8/9 hundo mb
+        Network.enable({maxTotalBufferSize: 1000000000}) // for response body retrieval roughly 8/9 hundo mb
       ])
     } catch (err) {
       console.error(err)
@@ -189,7 +189,6 @@ if (allLinksOnPage) {
       if (capture) {
         pageReqs.set(info.requestId, info)
       }
-
     })
     Network.responseReceived((info) => {
       if (capture) {
@@ -221,7 +220,7 @@ if (allLinksOnPage) {
         if (crawlThese.length > 0) {
           capture = true
           pageRes.clear()
-          pageReqs.clear()//allLinks
+          pageReqs.clear()// allLinks
           let url = crawlThese.shift()
           console.time('preserve page')
           Page.navigate({url}, (...args) => {
@@ -238,11 +237,11 @@ if (allLinksOnPage) {
       let rid = uuid()
       swapper.setValue(warcHeaderContent)
       let whc = Buffer.from('\r\n' + swapper.template({
-          version: '0.1',
-          isPartOfV: 'chromeCrawled',
-          warcInfoDescription: 'real chrome crawled',
-          ua: UA
-        }).s + '\r\n', 'utf8')
+        version: '0.1',
+        isPartOfV: 'chromeCrawled',
+        warcInfoDescription: 'real chrome crawled',
+        ua: UA
+      }).s + '\r\n', 'utf8')
       let wh = Buffer.from(swapper.setValue(warcHeader).template({
         fileName: path.basename(outPath),
         now,
@@ -472,7 +471,7 @@ if (allLinksOnPage) {
         Debugger.enable(),
         DOM.enable(),
         Page.enable(),
-        Network.enable({maxTotalBufferSize: 1000000000}), // for response body retrieval roughly 8/9 hundo mb
+        Network.enable({maxTotalBufferSize: 1000000000}) // for response body retrieval roughly 8/9 hundo mb
       ])
     } catch (err) {
       console.error(err)
@@ -491,7 +490,6 @@ if (allLinksOnPage) {
       if (capture) {
         pageReqs.set(info.requestId, info)
       }
-
     })
     Network.responseReceived((info) => {
       if (capture) {
@@ -519,11 +517,11 @@ if (allLinksOnPage) {
       let rid = uuid()
       swapper.setValue(warcHeaderContent)
       let whc = Buffer.from('\r\n' + swapper.template({
-          version: '0.1',
-          isPartOfV: 'chromeCrawled',
-          warcInfoDescription: 'real chrome crawled',
-          ua: UA
-        }).s + '\r\n', 'utf8')
+        version: '0.1',
+        isPartOfV: 'chromeCrawled',
+        warcInfoDescription: 'real chrome crawled',
+        ua: UA
+      }).s + '\r\n', 'utf8')
       let wh = Buffer.from(swapper.setValue(warcHeader).template({
         fileName: path.basename(outPath),
         now,
@@ -723,4 +721,3 @@ if (allLinksOnPage) {
     })
   })
 }
-
