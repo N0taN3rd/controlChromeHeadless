@@ -63,16 +63,21 @@ function doTestCrawl () {
     crawler.navigate(seedUrl)
   })
 
+  crawler.on('warc-gen-finished', () => {
+
+  })
+
   let out = []
   crawler.on('page-loaded', async loadedInfo => {
     console.log('page-loaded')
-    for (let capturedReqRes of crawler) {
-      out.push(capturedReqRes)
-      // if (capturedReqRes.redirectResponse) {
-      //   console.log(capturedReqRes)
-      // }
-    }
-    await fs.writeJSON('out3.json', out)
+    let outlinks = await crawler.getOutLinkMetadata()
+    // for (let capturedReqRes of crawler) {
+    //   out.push(capturedReqRes)
+    //   // if (capturedReqRes.redirectResponse) {
+    //   //   console.log(capturedReqRes)
+    //   // }
+    // }
+    // await fs.writeJSON('out3.json', out)
     await crawler.shutdown()
   })
 
