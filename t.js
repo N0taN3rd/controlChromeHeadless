@@ -63,14 +63,21 @@ function doTestCrawl () {
     crawler.navigate(seedUrl)
   })
 
-  crawler.on('warc-gen-finished', () => {
-
+  crawler.on('warc-gen-finished', async () => {
+    await crawler.shutdown()
   })
 
   let out = []
   crawler.on('page-loaded', async loadedInfo => {
     console.log('page-loaded')
+    crawler.initWARC('/home/john/WebstormProjects/controlChromeHeadless/collections/t2/archive/reuters2.warc')
     let outlinks = await crawler.getOutLinkMetadata()
+    try {
+      await crawler.genWarc({outlinks})
+    } catch (error) {
+      await crawler.shutdown()
+      // console.error(error)
+    }
     // for (let capturedReqRes of crawler) {
     //   out.push(capturedReqRes)
     //   // if (capturedReqRes.redirectResponse) {
@@ -78,7 +85,6 @@ function doTestCrawl () {
     //   // }
     // }
     // await fs.writeJSON('out3.json', out)
-    await crawler.shutdown()
   })
 
   crawler.init()
@@ -519,16 +525,11 @@ async function doIt () {
         default:
           console.log(nreq.method)
       }
-      // if (nreq.method === 'POST') {
-      //
-      // } else {
-      //   handleOther(nreq)
-      // }
     }
   }
 }
 
-// doTestCrawl()
+doTestCrawl()
 
 // runPromise(doIt())
 
