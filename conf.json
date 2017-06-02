@@ -6,7 +6,7 @@
   ],
   "warc": {
     "naming": "url",
-    "output": "/home/jberlin/WebstormProjects/controlChromeHeadless/warcholder"
+    "output": "warcholder"
   },
   "connect": {
     "host": "localhost",
