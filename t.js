@@ -13,7 +13,7 @@ const fileNamify = require('filenamify-url')
 const RequestMonitor = require('./lib/requestMonitor')
 const Crawler = require('./lib/crawler')
 const runPromise = require('./lib/runPromise')
-const Benchmark = require('benchmark')
+// const Benchmark = require('benchmark')
 
 function killAllJsAlertPromptConfirm (win) {
   Object.defineProperty(win, 'onbeforeunload', {
@@ -38,7 +38,7 @@ const noNaughtyJs = {
   scriptSource: `(${killAllJsAlertPromptConfirm.toString()})(window);`
 }
 
-let seedUrl = 'http://www.reuters.com/news'
+let seedUrl = 'http://www.cs.odu.edu/~maturban/'
 
 function doTestCrawl () {
   const crawler = Crawler.withAutoClose()
@@ -70,13 +70,13 @@ function doTestCrawl () {
   let out = []
   crawler.on('page-loaded', async loadedInfo => {
     console.log('page-loaded')
-    crawler.initWARC('/home/john/WebstormProjects/controlChromeHeadless/collections/t2/archive/reuters2.warc')
+    crawler.initWARC('ma.warc')
     let outlinks = await crawler.getOutLinkMetadata()
     try {
       await crawler.genWarc({outlinks})
     } catch (error) {
+      console.error(error)
       await crawler.shutdown()
-      // console.error(error)
     }
     // for (let capturedReqRes of crawler) {
     //   out.push(capturedReqRes)
