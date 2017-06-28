@@ -179,6 +179,7 @@ async function blastClick (DOM, DOMDebugger, Runtime) {
       try {
         resolvedNode = await DOM.resolveNode({nodeId: elm.nodeId})
         maybeListeners = await DOMDebugger.getEventListeners({objectId: resolvedNode.object.objectId})
+        console.log(maybeListeners)
       } catch (error) {
         console.error(error)
         continue
@@ -403,8 +404,6 @@ function go () {
         Page.enable(),
         Network.enable()
       ])
-
-      // await Page.setControlNavigations({enabled: true})
     } catch (err) {
       console.error(err)
     }
@@ -414,49 +413,52 @@ function go () {
     // Page.navigate({url: 'https://reacttraining.com/react-router/web/guides/quick-start'}, (...args) => {
     //   console.log('page navigate', ...args)
     // })
-    let seedUrl = 'http://web.archive.org/web/20170515050340/http://www.foodnetwork.com/'
+    let seedUrl = 'https://reacttraining.com/react-router/web/guides/quick-start' //'http://web.archive.org/web/20170515050340/http://www.foodnetwork.com/'
     Page.navigate({url: seedUrl}, (...args) => {
       console.log('page navigate', ...args)
     })
     // Array.from(document.links).map(it => it.href)
     let capture = true
     Page.loadEventFired(async (info) => {
+      await Page.setControlNavigations({enabled: true})
+      // await blastClick(DOM,DOMDebugger,Runtime)
+      let lm,vv
+      try {
+        lm = await Page.getLayoutMetrics()
+        vv = lm.visualViewport
+        // let windowBounds = await Browser.getWindowBounds()
+      } catch (error) {
+        console.error(error)
+      }
+      let ch = vv.clientHeight, cw = vv.clientWidth
+      for (let x = 0; x < cw; x += 15) {
+        for (let y = 0; y < ch; y += 5) {
+          try {
+            await Input.dispatchMouseEvent({x, y, type: 'mousePressed', button: 'left', clickCount: 1})
+            await Input.dispatchMouseEvent({x, y, type: 'mouseReleased', button: 'left', clickCount: 1})
+            console.log(`(${x},${y})`)
+          } catch (error) {
+            console.error(error)
+          }
+        }
 
+        // await maybeNavigate(Page)
+        console.log(x)
+      }
     })
-    Network.requestWillBeSent((info) => {
-      console.log(info.request.url)
-    })
-    Network.responseReceived((info) => {
-      console.log(info.request.url)
-    })
-
-    // Page.navigationRequested((args) => {
-    //   Page.processNavigation({navigationId: args.navigationId, response: 'Cancel'}, (err, response) => {
-    //     console.log(err, response)
-    //   })
+    // Network.requestWillBeSent((info) => {
+    //   console.log(info.request.url)
     // })
-    // try {
-    //   let lm = await Page.getLayoutMetrics()
-    //   vv = lm.visualViewport
-    //   // let windowBounds = await Browser.getWindowBounds()
-    // } catch (error) {
-    //   console.error(error)
-    // }
-    // let ch = vv.clientHeight, cw = vv.clientWidth
-    // for (let x = 0; x < cw; x += 15) {
-    //   for (let y = 0; y < ch; y += 5) {
-    //     try {
-    //       await Input.dispatchMouseEvent({x, y, type: 'mousePressed', button: 'left', clickCount: 1})
-    //       await Input.dispatchMouseEvent({x, y, type: 'mouseReleased', button: 'left', clickCount: 1})
-    //       // console.log(`(${x},${y})`)
-    //     } catch (error) {
-    //       console.error(error)
-    //     }
-    //   }
-    //
-    //   await maybeNavigate(Page)
-    //   console.log(x)
-    // }
+    // Network.responseReceived((info) => {
+    //   console.log(info.request.url)
+    // })
+
+    Page.navigationRequested((args) => {
+      Page.processNavigation({navigationId: args.navigationId, response: 'Cancel'}, (err, response) => {
+        console.log(err, response)
+      })
+    })
+
 
     // getDocument-BodyFinder 31.742ms
 
