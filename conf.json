@@ -1,8 +1,7 @@
 {
   "mode": "single-page",
   "seeds": [
-    "http://www.cs.odu.edu/~maturban/",
-    "http://www.reuters.com/news"
+    "https://ride.uber.com/"
   ],
   "warc": {
     "naming": "url",
