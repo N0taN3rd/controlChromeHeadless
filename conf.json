@@ -1,11 +1,10 @@
 {
   "mode": "single-page",
   "seeds": [
-    "https://ride.uber.com/"
+    "http://www.reuters.com/"
   ],
   "warc": {
-    "naming": "url",
-    "output": "warcholder"
+    "naming": "url"
   },
   "connect": {
     "host": "localhost",

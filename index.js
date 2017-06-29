@@ -14,7 +14,7 @@
  You should have received a copy of the GNU General Public License
  along with this Control Chrome Headless.  If not, see <http://www.gnu.org/licenses/>
  */
-
+console.log(process.env.HTTP11)
 const program = require('commander')
 const R = require('ramda')
 const configRunner = require('./lib/runners').configRunner
