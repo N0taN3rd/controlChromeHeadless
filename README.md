@@ -3,3 +3,6 @@
 Iv [origin-stamped](https://app.originstamp.org/home) this
 
 Oh did I mention patent :feelsgood:
+
+Remember Open Source and Comunity Envolvement!
+jk
