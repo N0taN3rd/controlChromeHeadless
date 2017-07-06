@@ -1,5 +1,5 @@
 {
-  "mode": "single-page",
+  "mode": "page-same-domain",
   "seeds": [
     "http://www.reuters.com/"
   ],
@@ -12,6 +12,6 @@
   },
   "timeouts": {
     "navigationTimeout": 8000,
-    "loadTimeout": 7000
+    "waitAfterLoad": 7000
   }
 }

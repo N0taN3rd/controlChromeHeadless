@@ -413,7 +413,7 @@ function go () {
     // Page.navigate({url: 'https://reacttraining.com/react-router/web/guides/quick-start'}, (...args) => {
     //   console.log('page navigate', ...args)
     // })
-    let seedUrl = 'https://reacttraining.com/react-router/web/guides/quick-start' //'http://web.archive.org/web/20170515050340/http://www.foodnetwork.com/'
+    let seedUrl = 'https://reacttraining.com/react-router/web/guides/quick-start' // 'http://web.archive.org/web/20170515050340/http://www.foodnetwork.com/'
     Page.navigate({url: seedUrl}, (...args) => {
       console.log('page navigate', ...args)
     })
@@ -422,7 +422,7 @@ function go () {
     Page.loadEventFired(async (info) => {
       await Page.setControlNavigations({enabled: true})
       // await blastClick(DOM,DOMDebugger,Runtime)
-      let lm,vv
+      let lm, vv
       try {
         lm = await Page.getLayoutMetrics()
         vv = lm.visualViewport
@@ -458,7 +458,6 @@ function go () {
         console.log(err, response)
       })
     })
-
 
     // getDocument-BodyFinder 31.742ms
 
