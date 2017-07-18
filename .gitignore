@@ -117,4 +117,8 @@ typings/
 # dotenv environment variables file
 .env
 
-
+*.warc
+/collections
+/warcholder
+/static
+/templates
