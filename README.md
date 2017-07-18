@@ -21,7 +21,7 @@ v60 is currently used and known to work well :+1:
 Not testing is done on canary or google-chrome-unstable so your millage may vary
 if you use these versions. Windows sorry your not supported yet.
 
-For more information see [https://developers.google.com/web/updates/2017/04/headless-chrome](Google web dev updates).
+For more information see [Google web dev updates](https://developers.google.com/web/updates/2017/04/headless-chrome).
 
 ### run-crawler.sh
 Once Chrome has been started you can use `run-crawler.sh`  passing it `-c <path-to-config.json>`
